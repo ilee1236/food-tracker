@@ -74,3 +74,12 @@ def set_used(conn, item_id, used):
         "UPDATE ITEMS SET USED = %s, USED_AT = IFF(%s, CURRENT_TIMESTAMP(), NULL) WHERE ITEM_ID = %s",
         (used, used, item_id),
     )
+
+
+def get_recently_used(conn, limit=3):
+    cur = conn.cursor().execute(
+        "SELECT ITEM_ID, NAME, CATEGORY, USED_AT FROM ITEMS WHERE USED AND USED_AT IS NOT NULL "
+        "ORDER BY USED_AT DESC LIMIT %s",
+        (limit,),
+    )
+    return pd.DataFrame(cur.fetchall(), columns=[c[0].lower() for c in cur.description])

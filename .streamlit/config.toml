@@ -1,0 +1,12 @@
+[theme]
+base = "dark"
+primaryColor = "#FF7AC6"
+backgroundColor = "#0B0B0E"
+secondaryBackgroundColor = "#17171C"
+textColor = "#F4F4F6"
+borderColor = "#2A2A31"
+baseRadius = "14px"
+font = "Nunito, sans-serif"
+
+[client]
+toolbarMode = "minimal"
