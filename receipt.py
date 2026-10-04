@@ -90,3 +90,21 @@ def extract(conn, stage_file):
         except ValueError:
             if attempt == 1:
                 raise ReceiptError("The receipt could not be read clearly. Try a sharper, flatter photo.")
+
+
+def clean_review_rows(rows):
+    """Keep only complete rows from the review table, in the shape save_receipt expects."""
+    items = []
+    for row in rows:
+        name = str(row.get("name") or "").strip()
+        category = _CATEGORY_LOOKUP.get(str(row.get("category") or "").strip().lower())
+        try:
+            price = round(float(row.get("price")), 2)
+        except (TypeError, ValueError):
+            continue
+        if not name or not category or price != price or price < 0:  # price != price catches NaN
+            continue
+        raw_name = str(row.get("raw_name") or "").strip()
+        items.append({"raw_name": raw_name if raw_name and raw_name != "nan" else name,
+                      "name": name, "category": category, "price": price})
+    return items
