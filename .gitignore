@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.p8
+*.pem
+.claude/
+test_receipts/
+output/
+.snowflake/
