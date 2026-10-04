@@ -83,3 +83,34 @@ def get_recently_used(conn, limit=3):
         (limit,),
     )
     return pd.DataFrame(cur.fetchall(), columns=[c[0].lower() for c in cur.description])
+
+
+def _frame(cur):
+    return pd.DataFrame(cur.fetchall(), columns=[c[0].lower() for c in cur.description])
+
+
+def get_period_totals(conn, period, count):
+    """Spend and receipt count per week or month, for the last `count` periods including the current one."""
+    unit = {"week": "week", "month": "month"}[period]
+    cur = conn.cursor().execute(
+        f"SELECT DATE_TRUNC('{unit}', PURCHASED_ON) AS period_start, SUM(FOOD_TOTAL) AS spend, COUNT(*) AS receipts "
+        f"FROM RECEIPTS WHERE PURCHASED_ON >= DATEADD({unit}, %s, DATE_TRUNC('{unit}', CURRENT_DATE())) "
+        "GROUP BY 1 ORDER BY 1",
+        (-(count - 1),),
+    )
+    return _frame(cur)
+
+
+def get_category_spend(conn, start, end):
+    """Spend per category for purchases with start <= date < end."""
+    cur = conn.cursor().execute(
+        "SELECT i.CATEGORY AS category, SUM(i.PRICE) AS spend FROM ITEMS i "
+        "JOIN RECEIPTS r ON r.RECEIPT_ID = i.RECEIPT_ID "
+        "WHERE r.PURCHASED_ON >= %s AND r.PURCHASED_ON < %s GROUP BY 1",
+        (start, end),
+    )
+    return _frame(cur)
+
+
+def get_today(conn):
+    return conn.cursor().execute("SELECT CURRENT_DATE()").fetchone()[0]

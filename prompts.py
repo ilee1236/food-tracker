@@ -40,3 +40,29 @@ Rules:
 - price is the line price as a number, without a currency symbol.
 - Do not invent items. If the image is not a receipt, return
   is_receipt false and an empty items list."""
+
+RECIPE_MODEL = "claude-haiku-4-5"
+
+RECIPE_PROMPT = """You suggest one home recipe. The cook has only these items:
+{items}
+
+Rules:
+- Use only items from the list, plus salt, pepper, oil and water.
+- You do not have to use every item.{avoid}
+- Estimate nutrition per serving from typical portion sizes. These are
+  rough estimates, not medical or diet advice.
+- Reply in this format:
+  Title
+  Uses: the pantry items used, comma-separated
+  Time: total minutes
+  Servings: number
+  Calories: kcal per serving
+  Protein: grams per serving
+  Carbs: grams per serving
+  Fat: grams per serving
+  Fiber: grams per serving
+  Sugar: grams per serving
+  Sodium: milligrams per serving
+  Steps: numbered, at most 8"""
+
+RECIPE_AVOID = "\n- Suggest something clearly different from these earlier ideas: {titles}."
